@@ -1,0 +1,8 @@
+streamlit
+PyPDF2
+langchain
+langchain-community
+langchain-groq
+python-dotenv
+pandas
+plotly
