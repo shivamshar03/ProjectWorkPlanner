@@ -17,9 +17,9 @@ Given the following project information, generate a project task breakdown as a 
 
 Each task dictionary should contain the following fields:
 - "Sprint": Sprint number (e.g., "Sprint 1")
-- "Task ID": A unique ID (e.g., "T1", "T2", etc.)
+- "Task_ID": A unique ID (e.g., "T1", "T2", etc.)
 - "Task": A short task description
-- "Task Dependency": List of Task IDs this task depends on, or an empty list
+- "Task_Dependency": List of Task IDs this task depends on, or an empty list
 - "Estimated Time": Estimated time in "X hours" or "Y days"
 - "Start": Start date (format: YYYY-MM-DD)
 - "End": End date (format: YYYY-MM-DD)

@@ -6,20 +6,18 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def get_llm():
-    return ChatGroq(
-        model_name="llama3-70b-8192"
-    )
+    return ChatGroq(model_name="llama3-70b-8192")
 
 def generate_tasks_with_llm(context_text: str):
     prompt = ChatPromptTemplate.from_template(
-                        """
+        """
 You are an expert project planner AI.
 
 Given the following project information, generate a project task breakdown as a JSON list of dictionaries.
 
 Each task dictionary should contain the following fields:
 - "Sprint": Sprint number (e.g., "Sprint 1")
-- "Task ID": A unique ID (e.g., "T1", "T2", etc.)
+- "Task_ID": A unique ID (e.g., "T1", "T2", etc.)
 - "Task": A short task description
 - "Task Dependency": List of Task IDs this task depends on, or an empty list
 - "Estimated Time": Estimated time in "X hours" or "Y days"
@@ -37,9 +35,7 @@ Each task dictionary should contain the following fields:
 {context_text}
 """
     )
+
     llm = get_llm()
     chain = prompt | llm | StrOutputParser()
-    print("-"*20)
-    print(chain.invoke({"context": context_text}))
-    print("-" * 20)
-    return chain.invoke({"context": context_text})
+    return chain.invoke({"context_text": context_text})

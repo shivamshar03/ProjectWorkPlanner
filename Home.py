@@ -1,11 +1,13 @@
+# app.py
 import streamlit as st
 import PyPDF2
 import pandas as pd
-import plotly.express as px
+
 from datetime import date, timedelta
-from io import StringIO
 import json
+import joblib
 from backend.llm_utils import generate_tasks_with_llm
+from backend.classification_embeddings import get_embeddings
 
 # ----------------- PDF Reader -----------------
 def extract_text_from_pdfs(files):
@@ -28,6 +30,23 @@ def get_working_days(start, end):
         current += timedelta(days=1)
     return working
 
+# ----------------- Load SVM model -----------------
+@st.cache_resource
+def load_model():
+    return joblib.load("modelsvm.pk1")
+
+model = load_model()
+
+# ----------------- Predict Module for Tasks -----------------
+def classify_module(task_name):
+    try:
+        embeddings = get_embeddings()
+        query_result = embeddings.embed_query(task_name)
+        return model.predict([query_result])[0]
+    except Exception as e:
+        print(f"Classification Error: {e}")
+        return "Uncategorized"
+
 # ----------------- Streamlit UI -----------------
 st.set_page_config("Project Work Planner", layout="wide", page_icon="assets/project-logo.png")
 st.title("📅 AI Project Analysis")
@@ -42,11 +61,9 @@ with col3:
 
 # --- Date Inputs ---
 with st.form("setup_form"):
-    col1, col2, col3 = st.columns([5, 5, 5])
-    with col1:
-        start_date = st.date_input("📅 Project Start Date", value=date.today())
-    with col2:
-        end_date = st.date_input("🏁 Estimated End Date")
+    col1, col2 = st.columns([1, 1])
+    start_date = col1.date_input("📅 Project Start Date", value=date.today())
+    end_date = col2.date_input("🏁 Estimated End Date")
     submitted = st.form_submit_button("✅ Confirm Date Range")
 
 # --- Save Dates ---
@@ -98,42 +115,22 @@ Net Working Days (excluding weekends + custom holidays):
 """
 
             with st.spinner("🔍 Generating tasks via LLM..."):
-                llm_response = generate_tasks_with_llm(context)
+                try:
+                    llm_response = generate_tasks_with_llm(context)
+                    task_list = json.loads(llm_response)
+                    df = pd.DataFrame(task_list)
 
-            try:
-                task_list = json.loads(llm_response)
-                df = pd.DataFrame(task_list)
+                except json.JSONDecodeError as e:
+                    st.error(f"❌ Failed to parse LLM output as JSON. Error: {e}")
+                    st.code(llm_response)
+
+            with st.spinner("🧠 Classifying tasks into modules..."):
+                df["Module"] = df["Task"].apply(classify_module)
+                if "Task" in df.columns and "Module" in df.columns:
+                    cols = df.columns.tolist()
+                    task_idx = cols.index("Task")
+                    cols.insert(task_idx, cols.pop(cols.index("Module")))
+                    df = df[cols]
                 st.session_state.tasks_df = df
                 st.success("✅ Tasks Generated Successfully")
-            except json.JSONDecodeError as e:
-                st.error(f"❌ Failed to parse LLM output as JSON. Error: {e}")
-                st.code(llm_response)
 
-# --- Display Task Table & Gantt Chart ---
-if "tasks_df" in st.session_state:
-    st.markdown("### ✍️ Editable Task Table")
-    edited_df = st.data_editor(st.session_state.tasks_df, num_rows="dynamic", use_container_width=True)
-
-    csv_data = edited_df.to_csv(index=False).encode("utf-8")
-    st.download_button("⬇️ Download CSV", csv_data, "task_schedule.csv", "text/csv")
-
-    if "Start" in edited_df.columns and "End" in edited_df.columns:
-        st.markdown("### 📊 Gantt Chart Visualization")
-        fig = px.timeline(
-            edited_df,
-            x_start="Start",
-            x_end="End",
-            y="Task",
-            color="Sprint",
-            title="🗓️ Project Timeline (If Start/End Dates Available)"
-        )
-        fig.update_yaxes(autorange="reversed")
-        fig.update_layout(height=min(800, 40 * len(edited_df)))
-        st.plotly_chart(fig, use_container_width=True)
-
-# --- Reset Button ---
-st.divider()
-if st.button("🔁 Reset All"):
-    for key in st.session_state.keys():
-        del st.session_state[key]
-    st.experimental_rerun()
