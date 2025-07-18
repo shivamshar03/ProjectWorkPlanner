@@ -15,11 +15,11 @@ if "Resource" not in st.session_state.tasks_df.columns:
     st.session_state.tasks_df["Resource"] = ""
 
 if "Progress" not in st.session_state.tasks_df.columns:
-    st.session_state.tasks_df["Progress"] = 0
+    st.session_state.tasks_df["Progress"] = "PENDING"
 
 # Convert to datetime
-st.session_state.tasks_df["Start"] = pd.to_datetime(st.session_state.tasks_df["Start"])
-st.session_state.tasks_df["End"] = pd.to_datetime(st.session_state.tasks_df["End"])
+st.session_state.tasks_df["Start"] = pd.to_datetime(st.session_state.tasks_df["Start"]).dt.date
+st.session_state.tasks_df["End"] = pd.to_datetime(st.session_state.tasks_df["End"]).dt.date
 st.session_state.tasks_df["Y_Index"] = list(range(len(st.session_state.tasks_df)))
 
 # Editable Data Table
@@ -28,9 +28,18 @@ edited_df = st.data_editor(
     st.session_state.tasks_df,
     num_rows="dynamic",
     use_container_width=True,
-    key="editable_table"
+    key="editable_table",
+    column_config={
+        "Progress": st.column_config.SelectboxColumn(
+            "Progress",
+            help="Select the current task status",
+            options=["PENDING", "IN PROGRESS", "COMPLETED", "BLOCKED"],
+            required=True,
+            default="PENDING"
+        )
+    }
 )
-col1, col2 = st.columns([2 , 2])
+col1, col2 = st.columns([1 , 1])
 
 with col1:
     if st.button("💾 Save Changes"):

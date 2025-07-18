@@ -9,4 +9,3 @@ plotly
 scikit-learn
 langchain-huggingface
 joblib
-sentence-transformers
