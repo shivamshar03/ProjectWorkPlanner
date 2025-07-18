@@ -78,18 +78,6 @@ col4, col5 = st.columns([1, 1])
 project_domain = col4.selectbox("Project Domain", ["Game Development", "Web Development", "App Development"])
 st.session_state.sprint = col5.selectbox("Sprint Timeline", ["Weekly", "Biweekly", "Monthly"])
 
-# Load appropriate model based on domain
-if project_domain == "Game Development":
-    model = load_model("models/game_dev.pk1")
-elif project_domain in ["Web Development", "App Development"]:
-    model = load_model("models/web_dev.pk1")
-else:
-    model = load_model("models/modelsvm.pk1")
-
-if model is None:
-    st.error("❌ Failed to load model. Please check the model files.")
-    st.stop()
-
 # --- Date Inputs ---
 with st.form("setup_form"):
     col6, col7 = st.columns([1, 1])
@@ -104,6 +92,18 @@ if submitted:
         st.stop()
     st.session_state.start_date = start_date
     st.session_state.end_date = end_date
+
+    # Load appropriate model based on domain
+    if project_domain == "Game Development":
+        model = load_model("models/game_dev.pk1")
+    elif project_domain in ["Web Development", "App Development"]:
+        model = load_model("models/web_dev.pk1")
+    else:
+        model = load_model("models/modelsvm.pk1")
+
+    if model is None:
+        st.error("❌ Failed to load model. Please check the model files.")
+        st.stop()
 
 # --- Holiday Selection & Task Gen ---
 if "start_date" in st.session_state and "end_date" in st.session_state:

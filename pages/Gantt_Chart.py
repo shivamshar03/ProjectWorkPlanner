@@ -42,6 +42,21 @@ fig.update_yaxes(
 # --- X-axis formatting ---
 fig.update_xaxes(showgrid=True, gridcolor="#2b6170", dtick="D1")
 
+# --- Status-to-Progress & Color Maps ---
+status_to_progress = {
+    "PENDING": 0,
+    "IN PROGRESS": 50,
+    "COMPLETED": 100,
+    "BLOCKED": 0
+}
+status_to_color = {
+    "PENDING": "#9c920e",
+    "IN PROGRESS": "#023e59",
+    "COMPLETED": "#3a5e43",
+    "BLOCKED": "#6b0933"
+}
+
+# --- Overlay progress bars ---
 for row in df.itertuples():
     try:
         status = str(getattr(row, "Progress", "PENDING")).strip().upper()
