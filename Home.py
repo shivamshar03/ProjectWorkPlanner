@@ -63,13 +63,15 @@ st.set_page_config(page_title="Project Work Planner", layout="wide", page_icon="
 st.title("📅 AI Project Analysis")
 
 # --- File Upload & Description ---
-col1, col2, col3 = st.columns([5, 0.5, 2])
+col1, col2, col3 = st.columns([5, 0.2, 2])
 with col1:
-    st.session_state.description = st.text_area("📝 Project Description / Specifications", height=150, key="desc_input")
-    st.session_state.files_uploaded = st.file_uploader("📄 Upload Project Files (PDF)", type="pdf", accept_multiple_files=True, key="pdf_input")
+    st.session_state.project_name = st.text_input("Project Name")
+    col1_1,col1_2 = st.columns([5,1.4])
+    st.session_state.description = col1_1.text_area("📝 Project Description / Specifications", height=160, key="desc_input")
+    st.session_state.files_uploaded = col1_2.file_uploader("📄 Upload Project Files (PDF)", type="pdf", accept_multiple_files=True, key="pdf_input")
 with col3:
     try:
-        st.image("assets/AI-project.png", width=350, use_container_width=False)
+        st.image("assets/AI-project.png", width=290, use_container_width=False)
     except Exception as e:
         logger.warning(f"Error loading image: {str(e)}")
         st.warning("⚠️ Could not load logo image")
