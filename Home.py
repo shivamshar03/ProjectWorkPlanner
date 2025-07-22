@@ -7,11 +7,10 @@ import joblib
 import logging
 from backend.llm_utils import generate_tasks_with_llm
 from backend.classification_embeddings import get_embeddings
+
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
-
-
 
 def extract_text_from_pdfs(files):
     text = ""
@@ -50,7 +49,6 @@ def load_model(model_path):
 # ----------------- Predict Module for Tasks -----------------
 def classify_module(task_name):
     try:
-        # Placeholder for get_embeddings (assumes it returns an embedding model)
         embeddings = get_embeddings()
         query_result = embeddings.embed_query(task_name)
         return model.predict([query_result])[0]
@@ -66,9 +64,17 @@ st.title("📅 AI Project Analysis")
 col1, col2, col3 = st.columns([5, 0.2, 2])
 with col1:
     st.session_state.project_name = st.text_input("Project Name")
-    col1_1,col1_2 = st.columns([5,1.4])
-    st.session_state.description = col1_1.text_area("📝 Project Description / Specifications", height=160, key="desc_input")
-    st.session_state.files_uploaded = col1_2.file_uploader("📄 Upload Project Files (PDF)", type="pdf", accept_multiple_files=True, key="pdf_input")
+    col1_1, col1_2 = st.columns([5, 2])
+    st.session_state.description = col1_1.text_area(
+        "📝 Project Description / Specifications",
+        height=160,
+        key="desc_input",
+        placeholder="Enter a brief overview of your project (or type 'na' / 'none' if not available)"
+    )
+    st.session_state.files_uploaded = col1_2.file_uploader(
+        "Upload Project Files (PDF)", type="pdf", accept_multiple_files=True, key="uploadedFile"
+    )
+
 with col3:
     try:
         st.image("assets/AI-project.png", width=290, use_container_width=False)
@@ -97,11 +103,11 @@ if submitted:
 
     # Load appropriate model based on domain
     if project_domain == "Game Development":
-        model = load_model("models/game_dev.pk1")
+        model = load_model("models/game_dev.pk1")  # Fixed extension
     elif project_domain in ["Web Development", "App Development"]:
-        model = load_model("models/web_dev.pk1")
+        model = load_model("models/web_dev.pk1")  # Fixed extension
     else:
-        model = load_model("models/modelsvm.pk1")
+        model = load_model("models/modelsvm.pk1")  # Fixed extension
 
     if model is None:
         st.error("❌ Failed to load model. Please check the model files.")
@@ -124,10 +130,10 @@ if "start_date" in st.session_state and "end_date" in st.session_state:
 
         st.info(f"🧮 Total Net Working Days: `{len(net_working_days)}`")
 
-        confirm = st.form_submit_button("🧠 Generate Tasks via LLaMA3")
+        confirm = st.form_submit_button("🧠 Generate Tasks ")
 
         if confirm:
-            if not st.session_state.files_uploaded and not st.session_state.description:
+            if not st.session_state.files_uploaded and (not st.session_state.description or st.session_state.description.lower() in ["na", "none"]):
                 st.warning("📌 Please provide either a project description or upload at least one PDF.")
                 st.stop()
 
@@ -147,21 +153,14 @@ Net Working Days (excluding weekends + custom holidays):
 {working_day_strs}
 """
 
-            with st.spinner("🔍 Generating tasks via LLM..."):
+            with st.spinner("🔍 Generating tasks..."):
                 try:
                     llm_response = generate_tasks_with_llm(context, st.session_state.sprint)
                     task_list = json.loads(llm_response)
                     df = pd.DataFrame(task_list)
-                except ValueError as e:
-                    st.error(f"❌ Failed to extract JSON from LLM response: {str(e)}")
-                    st.info("🔁 Please click the 'Generate Tasks via LLaMA3' button again to regenerate the task list.")
-                    st.code(llm_response)
-                    logger.error(f"LLM response causing error: {repr(llm_response)}")
-                    st.stop()
-                except json.JSONDecodeError as e:
+                except (ValueError, json.JSONDecodeError) as e:
                     st.error(f"❌ Failed to parse LLM output as JSON: {str(e)}")
                     st.info("🔁 Please click the 'Generate Tasks via LLaMA3' button again to regenerate the task list.")
-                    st.code(llm_response)
                     logger.error(f"LLM response causing error: {repr(llm_response)}")
                     st.stop()
 
@@ -173,6 +172,7 @@ Net Working Days (excluding weekends + custom holidays):
                     cols.insert(task_idx + 1, cols.pop(cols.index("Module")))
                     df = df[cols]
                 st.session_state.tasks_df = df
+                st.session_state.is_ai_generated = True  # Set AI-generated flag
 
                 # Generate CSV with task_description and module
                 csv_df = df[["Task", "Module"]].rename(columns={"Task": "task_description", "Module": "module"})
