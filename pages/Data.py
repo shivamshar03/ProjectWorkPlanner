@@ -3,12 +3,14 @@ import pandas as pd
 import plotly.express as px
 from pymongo import MongoClient
 from datetime import datetime, date, time
+from dotenv import load_dotenv
 
 # ---------------- MongoDB Setup ----------------
-MONGO_URI = "mongodb://localhost:27017/"
+load_dotenv()
+
 DB_NAME = "task_planner_db"
 try:
-    client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
+    client = MongoClient(serverSelectionTimeoutMS=5000)
     client.server_info()  # Test connection
     db = client[DB_NAME]
 except Exception as e:

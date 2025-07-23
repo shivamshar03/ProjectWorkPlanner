@@ -4,16 +4,17 @@ import plotly.graph_objects as go
 from pymongo import MongoClient
 from datetime import datetime, date, time
 import logging
+from dotenv import load_dotenv
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
-
+load_dotenv()
 # MongoDB Setup
-MONGO_URI = "mongodb://localhost:27017/"
+
 DB_NAME = "task_planner_db"
 try:
-    client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
+    client = MongoClient( serverSelectionTimeoutMS=5000)
     client.server_info()  # Test connection
     db = client[DB_NAME]
 except Exception as e:

@@ -10,3 +10,4 @@ scikit-learn
 langchain-huggingface
 joblib
 pymongo
+sentence-transformers

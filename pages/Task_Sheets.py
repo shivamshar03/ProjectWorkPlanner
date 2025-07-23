@@ -1,11 +1,13 @@
 import streamlit as st
 import pandas as pd
 from pymongo import MongoClient
-
+from dotenv import load_dotenv
 # ---------------- MongoDB Setup ----------------
-MONGO_URI = "mongodb://localhost:27017/"
+
+load_dotenv()
+
 DB_NAME = "task_planner_db"
-client = MongoClient(MONGO_URI)
+client = MongoClient()
 db = client[DB_NAME]
 
 # ---------------- Page Setup ----------------
