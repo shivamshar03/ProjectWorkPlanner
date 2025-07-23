@@ -1,16 +1,25 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from pymongo import MongoClient
 from datetime import datetime, date, time
+from pymongo import MongoClient
+from urllib.parse import quote_plus
 from dotenv import load_dotenv
+import os
 
-# ---------------- MongoDB Setup ----------------
+# Load environment variables
 load_dotenv()
 
-DB_NAME = "task_planner_db"
+# Get credentials and escape
+username = quote_plus(os.getenv("MONGO_USER"))
+password = quote_plus(os.getenv("MONGO_PASS"))
+cluster = os.getenv("MONGO_CLUSTER")
+DB_NAME = os.getenv("MONGO_DB")
+
+# Build Mongo URI
+uri = f"mongodb+srv://{username}:{password}@{cluster}/{DB_NAME}?retryWrites=true&w=majority"
 try:
-    client = MongoClient(serverSelectionTimeoutMS=5000)
+    client = MongoClient(uri,serverSelectionTimeoutMS=5000)
     client.server_info()  # Test connection
     db = client[DB_NAME]
 except Exception as e:

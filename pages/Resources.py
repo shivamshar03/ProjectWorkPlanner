@@ -4,17 +4,27 @@ import plotly.graph_objects as go
 from pymongo import MongoClient
 from datetime import datetime, date, time
 import logging
+from urllib.parse import quote_plus
 from dotenv import load_dotenv
+import os
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
-load_dotenv()
-# MongoDB Setup
 
-DB_NAME = "task_planner_db"
+# Load environment variables
+load_dotenv()
+
+# Get credentials and escape
+username = quote_plus(os.getenv("MONGO_USER"))
+password = quote_plus(os.getenv("MONGO_PASS"))
+cluster = os.getenv("MONGO_CLUSTER")
+DB_NAME = os.getenv("MONGO_DB")
+
+# Build Mongo URI
+uri = f"mongodb+srv://{username}:{password}@{cluster}/{DB_NAME}?retryWrites=true&w=majority"
 try:
-    client = MongoClient( serverSelectionTimeoutMS=5000)
+    client = MongoClient(uri,serverSelectionTimeoutMS=5000)
     client.server_info()  # Test connection
     db = client[DB_NAME]
 except Exception as e:
