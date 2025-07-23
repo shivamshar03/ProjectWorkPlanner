@@ -60,20 +60,19 @@ if "resources" not in st.session_state:
     resource_data = list(resource_collection.find({}))
     for doc in resource_data:
         doc.pop("_id", None)
-    st.session_state.resources = resource_data if resource_data else [
-        {"name": "Team Member 1", "role": "Developer", "skills": ["Python", "JavaScript"], "availability": "Available"},
-        {"name": "Team Member 2", "role": "Designer", "skills": ["UI/UX", "Figma"], "availability": "Available"},
-        {"name": "Team Member 3", "role": "Manager", "skills": ["Project Management"], "availability": "Available"}
-    ]
+    if resource_data:
+        st.session_state.resources = resource_data
+
 
 # Resource Profile Form
 with st.form("resource_profile_form"):
     st.markdown("#### Add/Edit Resource Profile")
-    col1, col2, col3 = st.columns([1, 1, 1])
-    resource_name = col1.text_input("Resource Name", placeholder="e.g., John Doe")
+    col1, col2 = st.columns([1, 1])
+    resource_name = col1.text_input("Resource Name", placeholder="e.g., Shivam Sharma")
     resource_role = col2.selectbox("Role", ["Developer", "Designer", "Manager", "Tester", "Other"])
+    col3, col4 = st.columns([1,1])
     resource_skills = col3.text_input("Skills (comma-separated)", placeholder="e.g., Python, UI/UX")
-    resource_availability = st.selectbox("Status", ["Available", "Assigned"])
+    resource_availability = col4.selectbox("Status", ["Available", "Assigned"])
     submit_resource = st.form_submit_button("➕ Add/Update Resource")
     if submit_resource:
         if not resource_name:
@@ -99,6 +98,7 @@ with st.form("resource_profile_form"):
             else:
                 st.session_state.resources.append(resource_doc)
             st.success(f"✅ Resource '{resource_name}' added/updated.")
+
 
 # Editable Resource Profiles Table
 st.markdown("### 📋 Editable Resource Profiles")
