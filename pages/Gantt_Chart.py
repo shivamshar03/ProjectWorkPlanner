@@ -49,20 +49,13 @@ status_to_progress = {
     "COMPLETED": 100,
     "BLOCKED": 0
 }
-status_to_color = {
-    "PENDING": "#9c920e",
-    "IN PROGRESS": "#023e59",
-    "COMPLETED": "#3a5e43",
-    "BLOCKED": "#6b0933"
-}
+
 
 # --- Overlay progress bars ---
 for row in df.itertuples():
     try:
         status = str(getattr(row, "Progress", "PENDING")).strip().upper()
         progress_value = status_to_progress.get(status, 0)
-        progress_color = status_to_color.get(status, "gray")
-
         start_date = pd.to_datetime(row.Start)
         end_date = pd.to_datetime(row.End)
 
@@ -76,7 +69,7 @@ for row in df.itertuples():
             x=[start_date, progress_end],
             y=[row.Y_Index, row.Y_Index],
             mode="lines",
-            line=dict(color=progress_color, width=6),
+            line=dict(color= "black", width=6),
             showlegend=False,
             hoverinfo="skip"
         ))
@@ -93,20 +86,29 @@ task_pos = {
 }
 
 for row in df.itertuples():
-    dependencies = row.Task_Dependency
+    dependencies = row.Task_Dependency if "Task_Dependency" in df.columns else []
+    if isinstance(dependencies, str):
+        dependencies = [dep.strip() for dep in dependencies.split(",") if dep.strip()]
     if isinstance(dependencies, list) and dependencies:
         for dep_id in dependencies:
             dep_id = str(dep_id).strip()
-            if dep_id in task_pos and row.Task_ID in task_pos:
+            if dep_id in task_pos and str(row.Task_ID) in task_pos:
                 dep = task_pos[dep_id]
-                cur = task_pos[row.Task_ID]
-
+                cur = task_pos[str(row.Task_ID)]
                 fig.add_annotation(
-                    x=cur["x_start"], y=cur["y"],
-                    ax=dep["x_end"], ay=dep["y"],
-                    xref="x", yref="y", axref="x", ayref="y",
-                    showarrow=True, arrowhead=3, arrowsize=1,
-                    arrowwidth=3, arrowcolor="#9769cf"
+                    x=cur["x_start"],
+                    y=cur["y"],
+                    ax=dep["x_end"],
+                    ay=dep["y"],
+                    xref="x",
+                    yref="y",
+                    axref="x",
+                    ayref="y",
+                    showarrow=True,
+                    arrowhead=3,
+                    arrowsize=1,
+                    arrowwidth=3,
+                    arrowcolor="#9769cf",
                 )
 
 # --- Final Layout Fixes ---

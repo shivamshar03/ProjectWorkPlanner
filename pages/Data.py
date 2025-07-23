@@ -133,7 +133,8 @@ with col1:
         st.session_state.tasks_df = edited_df
         if "project_name" not in st.session_state:
             st.error("⚠️ `project_name` not found in session.")
-        elif st.checkbox("Confirm overwrite of existing collection"):
+
+        else:
             try:
                 project_name = st.session_state.project_name
                 collection = db[project_name]
@@ -144,8 +145,6 @@ with col1:
                 st.success(f"✅ Project `{project_name}` saved!")
             except Exception as e:
                 st.error(f"❌ Failed to save to DataBase: {e}")
-        else:
-            st.warning("⚠️ Please confirm to overwrite the Project.")
 
 with col2:
     csv = edited_df.to_csv(index=False).encode("utf-8")

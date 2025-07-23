@@ -9,24 +9,24 @@ client = MongoClient(MONGO_URI)
 db = client[DB_NAME]
 
 # ---------------- Page Setup ----------------
-st.set_page_config("📂 Collection Viewer", layout="wide", page_icon="🗂️")
-st.title("📂 MongoDB Collection Viewer")
+st.set_page_config("📂 Projects Viewer", layout="wide", page_icon="🗂️")
+st.title("📂 Project Work Plan Sheets Viewer")
 
 # ---------------- Collection Selection ----------------
 collections = db.list_collection_names()
 
 if not collections:
-    st.error("❌ No collections found in the database.")
+    st.error("❌ No Project found in the database.")
     st.stop()
 
-selected_collection = st.selectbox("🔽 Select a collection to view", collections)
+selected_collection = st.selectbox("🔽 Select Project", collections)
 
 # ---------------- Load Data ----------------
 collection = db[selected_collection]
 data = list(collection.find({}))
 
 if not data:
-    st.warning("⚠️ This collection is empty.")
+    st.warning("⚠️ This Project is empty.")
     st.stop()
 
 # Drop ObjectId for display
