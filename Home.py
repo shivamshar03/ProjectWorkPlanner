@@ -83,7 +83,7 @@ with col3:
         st.warning("⚠️ Could not load logo image")
 
 col4, col5 = st.columns([1, 1])
-project_domain = col4.selectbox("Project Domain", ["Game Development", "Web Development", "App Development"])
+project_domain = col4.selectbox("Project Domain", ["Game Development", "Web Development", "App Development" , "Custom"])
 st.session_state.sprint = col5.selectbox("Sprint Timeline", ["Weekly", "Biweekly", "Monthly"])
 
 # Date Inputs
@@ -107,11 +107,11 @@ if submitted:
 
     # Load appropriate model based on domain
     if project_domain == "Game Development":
-        model = load_model("models/game_dev.pk1")
+        model = load_model("models/game_dev.pkl")
     elif project_domain in ["Web Development", "App Development"]:
-        model = load_model("models/web_dev.pk1")
+        model = load_model("models/web_dev.pkl")
     else:
-        model = load_model("models/modelsvm.pk1")
+        model = load_model("models/modelsvm.pkl")
 
     if model is None:
         st.error("❌ Failed to load model. Please check the model files.")
