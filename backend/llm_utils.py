@@ -13,39 +13,41 @@ def generate_tasks_with_llm(context_text: str,sprints):
         """
      You are an expert project planner AI.
 
-     🎯 Objective:
-     Generate a structured task breakdown for the project using valid JSON format only.
+🎯 Objective:
+Generate a structured task breakdown for the project using valid JSON format only.
 
-     📦 Sprint Setup:
-     - Sprint Duration Type: {sprints} (e.g., weekly = 7 days, biweekly = 14 days, monthly = approx. 30 days)
-     - Tasks must be assigned strictly within the boundaries of their respective sprint windows.
-     - Sprint 1 should begin on the project start date.
-     - Sprint 2 starts after Sprint 1 ends, and so on.
+📦 Sprint Setup:
+- Sprint Duration Type: {sprints} (e.g., weekly = 7 days, biweekly = 14 days, monthly = approx. 30 days)
+- Tasks must be assigned strictly within the boundaries of their respective sprint windows.
+- Sprint 1 should begin on the project start date.
+- Sprint 2 starts after Sprint 1 ends, and so on.
 
-     📄 Input Context:
-     {context_text}
+📄 Input Context:
+{context_text}
 
-     📌 Output JSON format:
-     [
-       {{
-         "Sprint": "Sprint 1",
-         "Task_ID": "T1",
-         "Task": "Design the landing page UI",
-         "Task_Dependency": [],
-         "Estimated Time": "2 days",
-         "Start": "YYYY-MM-DD",
-         "End": "YYYY-MM-DD"
-       }},
-       ...
-     ]
+📌 Output JSON format:
+[
+  {{
+    "Sprint": "Sprint 1",
+    "Task_ID": "T1",
+    "Task": "Design the landing page UI",
+    "Task_Dependency": [],
+    "Estimated Time": "2 days",
+    "Start": "YYYY-MM-DD",
+    "End": "YYYY-MM-DD"
+  }},
+  ...
+]
 
-     🚫 Constraints:
-     - Output must be pure valid JSON only — no comments, markdown, explanation, or extra text.
-     - Use only the working days provided in the context.
-     - Exclude weekends and user-defined holidays.
-     - Respect task dependencies: a task must start **after** all its dependencies end.
-     - Distribute tasks logically across all sprints.
-     - If the timeline is tight, slightly extend the project end date, but stay close.
+🚫 Constraints:
+- Output must be pure valid JSON only — no comments, markdown, explanation, or extra text.
+- Use only the working days provided in the context.
+- Exclude weekends and user-defined holidays.
+- Respect task dependencies: a task must start **after** all its dependencies end.
+- Distribute tasks logically across all sprints.
+- Tasks can run in **parallel** (i.e., multiple tasks can occur on the same day) **as long as they do not conflict by dependency.**
+- If the timeline is tight, slightly extend the project end date, but stay close.
+
      """
     )
 

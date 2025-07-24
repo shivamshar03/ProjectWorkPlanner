@@ -138,6 +138,8 @@ if "start_date" in st.session_state and "end_date" in st.session_state:
             if not st.session_state.files_uploaded and (not st.session_state.description or st.session_state.description.lower() in ["na", "none"]):
                 st.warning("📌 Please provide either a project description or upload at least one PDF.")
                 st.stop()
+            if not st.session_state.project_name or st.session_state.project_name == " ":
+                st.warning("Please enter the project name !!")
 
             pdf_text = extract_text_from_pdfs(st.session_state.files_uploaded) if st.session_state.files_uploaded else ""
             working_day_strs = [d.strftime("%Y-%m-%d") for d in net_working_days]
