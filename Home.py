@@ -5,7 +5,7 @@ from datetime import date, timedelta
 import json
 import joblib
 import logging
-from backend.llm_utils import generate_tasks_with_llm
+from backend.llm_utils import generate_tasks_with_llm,example
 from backend.classification_embeddings import get_embeddings
 
 # Set up logging
@@ -185,3 +185,5 @@ Net Working Days (excluding weekends + custom holidays):
                 st.session_state.tasks_df = df
                 st.session_state.is_ai_generated = True
                 st.success("✅ Tasks Generated Successfully")
+
+            st.write(example(pdf_text,st.session_state.description))

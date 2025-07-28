@@ -54,3 +54,46 @@ Generate a structured task breakdown for the project using valid JSON format onl
     llm = get_llm()
     chain = prompt | llm | StrOutputParser()
     return chain.invoke({"context_text": context_text , "sprints": sprints})
+
+
+def example(pdf_txt,description):
+    prompt = ChatPromptTemplate.from_template(
+
+        """ Prompt for Generating a Project Task Table
+        Prompt:
+        You are a project management assistant tasked with creating a structured table to organize tasks for a given project. The table should have three columns: Planning, Assets, and Feature. Based on the project description provided below, generate a comprehensive list of tasks required to complete the project. Classify each task into one of the three columns (Planning, Assets, or Feature) and list them in the order they should be executed. Ensure the tasks are specific, actionable, and relevant to the project description. Format the output as a markdown table.
+        Project Description:{pdf_txt}
+        Instructions:
+    
+        Analyze the project description to identify all necessary tasks.
+        Categorize each task into one of the following columns:
+        Planning: Tasks related to project strategy, timelines, research, or coordination (e.g., defining scope, creating timelines, stakeholder meetings).
+        Assets: Tasks related to creating or acquiring resources, tools, or materials (e.g., designing assets, purchasing software, gathering data).
+        Feature: Tasks related to developing or implementing specific functionalities or deliverables (e.g., coding a feature, testing a component, deploying a module).
+    
+    
+        List tasks in the chronological order of execution, ensuring dependencies are considered (e.g., planning tasks typically come before asset creation, which precedes feature development).
+        Present the tasks in a markdown table with the columns Planning, Assets, and Feature. If a task does not apply to a column for a given row, leave that cell empty.
+        Ensure the table is clear, concise, and professional, with tasks described in a way that is actionable and specific to the project.
+    
+        Example Output:
+    
+        | Planning                          | Assets                         | Feature                      |
+        |-----------------------------------|--------------------------------|------------------------------|
+        | Define project scope and objectives |                                |                              |
+        | Create project timeline           |                                |                              |
+        |                                   | Design UI mockups             |                              |
+        |                                   | Set up development environment |                              |
+        |                                   |                                | Implement user authentication |
+        |                                   |                                | Test feature compatibility   |
+        |                                   |                                | Deploy project to production  |
+    
+    
+        Project Description for Processing:{description}
+        """)
+
+    llm = get_llm()
+    chain = prompt | llm | StrOutputParser()
+    return chain.invoke({"pdf_txt": pdf_txt, "description": description})
+
+
